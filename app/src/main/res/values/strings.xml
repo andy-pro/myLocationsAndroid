@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">myLocations</string>
+
+    <string name="action_search">Search</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="category_opts">Category options</string>
+    <string name="new_category">New category</string>
+    <string name="edit_category">Edit category</string>
+    <string name="del_category">Delete category</string>
+
+    <string name="location_opts">Location options</string>
+    <string name="new_location">New location</string>
+    <string name="edit_location">Edit location</string>
+    <string name="del_location">Delete location</string>
+    <string name="copy_location">Copy location</string>
+
+    <string name="map_not_ready">Map is not ready yet</string>
+    <string name="shure">Are you shure?</string>
+
+    <string name="location">Location</string>
+    <string name="category">Category</string>
+    <string name="title">Title</string>
+    <string name="name">Name</string>
+    <string name="address">Address</string>
+    <string name="coords">Coordinates</string>
+    <string name="lat">Latitude</string>
+    <string name="lng">Longitude</string>
+    <string name="zoom">Zoom</string>
+
+    <string name="add_record">Добавить</string>
+    <string name="edit_record">Редактировать</string>
+    <string name="delete_record">Удалить</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="number_list">Список чисел</string>
+    <string name="empty">Нет данных</string>
+
+    <string-array name="headers">
+        <item>Header 1</item>
+        <item>Header 2</item>
+        <item>Header 3</item>
+        <item>Header 4</item>
+    </string-array>
+    <string-array name="content">
+        <item>Content 1</item>
+        <item>Content 2</item>
+        <item>Content 3</item>
+        <item>Content 4</item>
+    </string-array>
+
+</resources>

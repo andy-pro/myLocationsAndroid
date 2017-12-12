@@ -1,0 +1,65 @@
+{
+  "categories":[
+    {"name": "Cities of the World", "id": 1},
+    {"name": "Ukraine", "id": 2},
+    {"name": "Russia", "id": 3}
+  ],
+  "locations": [
+    {
+      "name": "Saint-Petersburg",
+      "address": "Россия",
+      "category": 3,
+      "lat": 59.940224,
+      "lng": 30.308533,
+      "zoom": 12
+    },
+    {
+      "name": "Sydney",
+      "address": "Австралия",
+      "category": 1,
+      "lat": -33.847608,
+      "lng": 150.930176,
+      "zoom": 12
+    },
+    {
+      "name": "Пекин",
+      "address": "Китай",
+      "category": 1,
+      "lat": 39.9182,
+      "lng": 116.4551,
+      "zoom": 12
+    },
+    {
+      "name": "New York",
+      "address": "USA",
+      "category": 1,
+      "lat": 40.711353,
+      "lng": -74.002533,
+      "zoom": 11
+    },
+    {
+      "name": "London",
+      "address": "Великобритания",
+      "category": 1,
+      "lat": 51.510452,
+      "lng": -0.127716,
+      "zoom": 10
+    },
+    {
+      "name": "Donetsk",
+      "address": "Donetsk",
+      "category": 2,
+      "lat": 47.9957,
+      "lng": 37.8592,
+      "zoom": 14
+    },
+    {
+      "name": "Perekopovka",
+      "address": "Роменский район",
+      "category": 2,
+      "lat": 50.6092,
+      "lng": 33.4515,
+      "zoom": 15
+    }
+  ]
+}

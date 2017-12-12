@@ -1,0 +1,3 @@
+<resources>
+    <item name="content_main" type="layout">@layout/content_main_twopanes</item>
+</resources>
