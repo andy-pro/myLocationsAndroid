@@ -26,42 +26,48 @@ import java.util.ArrayList;
 import android.database.Cursor;
 import android.widget.Toast;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 
 import com.andypro.mylocations.provider.LocationProvider;
 import com.andypro.mylocations.utils.Constants;
 
 public class MainActivity extends AppCompatActivity implements
         ListViewFragment.ListViewCallbacks,
-        ListDialogFragment.ListDialogCallbacks,
+//        ListDialogFragment.ListDialogCallbacks,
         MapFragment.MapCallbacks {
 
+    final int REQUEST_CODE_MAP = 1;
+    final int DIALOG_DELETE = 1;
 //    String name = "London";
 //    double lat = 51.510452;
 //    double lng = -0.127716;
 //    float zoom = 10F;
 //    long locationId = -1;
+
     boolean withMap = true;
-    Location location;
-
-    final int REQUEST_CODE_MAP = 1;
-    final int DIALOG_DELETE = 1;
-
+//    CameraPosition cameraPosition = null;
+    Location currentMapPosition;
     boolean locationMode;
     int currentCmd;
     HashMap currentEntry;
 
     ActionMode mActionMode;
-    ArrayList<ArrayList<String>> categoryList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            currentMapPosition = savedInstanceState.getParcelable("map_position");
+            locationMode = savedInstanceState.getBoolean("location_mode");
+            currentCmd = savedInstanceState.getInt("current_cmd");
+            currentEntry = (HashMap) savedInstanceState.getSerializable("current_entry");
+        }
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,21 +76,25 @@ public class MainActivity extends AppCompatActivity implements
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 */
-                locationMode = true;
                 currentCmd = R.id.menu_add;
-                currentEntry = new Location(true, getEntryId()).toHashMap();
+                int count = getListViewFragment().getCategoryCount();
+                if (count > 0) {
+                    currentEntry = getEntryFromMapPosition();
+                    locationMode = true;
+                } else {
+                    currentEntry = new Category().toHashMap();
+                    locationMode = false;
+                }
                 showListViewDialog();
             }
         });
 
-        Location location = (savedInstanceState == null) ? new Location(false, -1) :
-                (Location) savedInstanceState.getParcelable("location");
-
-//        Location location = new Location(false, -1);
+        currentMapPosition = savedInstanceState == null ? new Location() :
+                (Location) savedInstanceState.getParcelable("map_position");
 
         withMap = findViewById(R.id.map_frame) != null;
         if (withMap)
-            showMap(location);
+            showMap(currentMapPosition);
 
         log("Start app");
     }
@@ -108,9 +118,9 @@ public class MainActivity extends AppCompatActivity implements
             }
 
         } else {
-            Intent intent = new Intent(this, MapActivity.class);
+//            Intent intent = new Intent(this, MapActivity.class);
+            Intent intent = new Intent(getApplicationContext(), MapActivity.class);
             intent.putExtra("location", location);
-//            startActivity(intent);
             startActivityForResult(intent, REQUEST_CODE_MAP);
         }
     }
@@ -156,23 +166,48 @@ public class MainActivity extends AppCompatActivity implements
             currentCmd = item.getItemId();
 //            boolean menu_add = currentCmd == R.id.menu_add;
 
+/*
             if (currentCmd == R.id.menu_new_location) {
                 locationMode = true;
                 currentCmd = R.id.menu_add;
-//                categoryId = getEntryId();
                 currentEntry = new Location(true, getEntryId()).toHashMap();
             }
-//            else if (locationMode && currentCmd == R.id.menu_add) {
-//                categoryId = getEntryValue(Constants.LOCATION_CATEGORY);
-//            }
+*/
+            if (currentCmd == R.id.menu_new_location) {
+                /* new location for current category,
+                   performed in categoryMode */
+                currentCmd = R.id.menu_add;
+                currentEntry = getEntryFromMapPosition();
+                locationMode = true;
+            }
+            else if (locationMode && currentCmd == R.id.menu_add) {
+                /* new location in locationMode */
+                String address = currentEntry.get(Constants.LOCATION_ADDRESS).toString();
+                currentEntry = getEntryFromMapPosition();
+                currentEntry.put(Constants.LOCATION_ADDRESS, address);
+                /*
+                currentLocation.name = currentEntry.get("name").toString();
+                currentLocation.address = currentEntry.get("address").toString();
+                currentLocation.category = getEntryId();
+                currentEntry = currentLocation.toHashMap();
+                */
+
+            }
+            /*
+            else if (locationMode && currentCmd == R.id.menu_edit) {
+                currentEntry.put(Constants.LOCATION_LAT, currentMapPosition.lat);
+                currentEntry.put(Constants.LOCATION_LNG, currentMapPosition.lng);
+                currentEntry.put(Constants.LOCATION_ZOOM, currentMapPosition.zoom);
+            }
+            */
 
 //            if (currentCmd == R.id.menu_add) {
 //                currentEntry = locationMode ? new Location(true, categoryId).toHashMap()
 //                        : new Category().toHashMap();
 //            }
-            else
-            if (!locationMode && currentCmd == R.id.menu_add) {
-                currentEntry = new Category().toHashMap();
+            else if (!locationMode && currentCmd == R.id.menu_add) {
+//                currentEntry = new Category().toHashMap();
+                currentEntry.put(Constants.COMMON_NAME, "");
             }
 
             showListViewDialog();
@@ -190,9 +225,9 @@ public class MainActivity extends AppCompatActivity implements
     /* ListView Dialog */
     private void showListViewDialog() {
 
-        ListViewFragment list = (ListViewFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.main_list_fragment);
-        categoryList = list.getCategoryNames();
+//        ListViewFragment list = (ListViewFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.main_list_fragment);
+//        categoryList = list.getCategoryNames();
 
 //        log("GET group position: " +  list.groupPosition);
 
@@ -202,33 +237,24 @@ public class MainActivity extends AppCompatActivity implements
             showDialog(DIALOG_DELETE);
         } else {
             /* ADD, EDIT modes */
+            /*
+            categoryList = getListViewFragment().getCategoryNames();
             FragmentManager fm = getSupportFragmentManager();
-            Log.d(Constants.LOG_TAG, "list dialog on show: entry:" + currentEntry.get("name"));
-            ListDialogFragment dlg = ListDialogFragment.newInstance(
-                    locationMode, currentCmd, currentEntry, categoryList);
+            Log.d(Constants.LOG_TAG, "list dialog on show: entry:" + currentEntry.get("name") + categoryList);
+            ListDialogFragment dlg = ListDialogFragment.newInstance();
+//            ListDialogFragment dlg = ListDialogFragment.newInstance(
+//                    locationMode, currentCmd, currentEntry, categoryList);
             dlg.show(fm, "edit_entry_dialog");
+            */
+            ListDialogFragment dialog = new ListDialogFragment();
+            dialog.show(getSupportFragmentManager(), "ListDialogFragment");
         }
     }
 
-    public void onOkListViewDialog(View view) {
+    public void onOkListViewDialog(ContentValues cv) {
         int count;
-        ContentValues cv = null;
-
-//        Long currentId = currentCmd == Constants.MENU_ADD ? null :
-//                Long.parseLong(currentEntry.get(Constants.COMMON_ID).toString());
-//        String currentId = currentEntry.get(Constants.COMMON_ID).toString();
         String[] args = { currentEntry.get(Constants.COMMON_ID).toString() };
-
         Uri uri = locationMode ? LocationProvider.LOCATION_URI : LocationProvider.CATEGORY_URI;
-
-        if (currentCmd != R.id.menu_delete) {
-            // for "insert" command currentId=null, so ContentValues do not contains "_id"
-//            cv = locationMode ? new Location(view).toContentValues(currentId) :
-            cv = locationMode ? Location.getContentValues(view, categoryList) :
-                    Category.getContentValues(view);
-        }
-
-        categoryList = null;
 
         Log.d(Constants.LOG_TAG, "db content from fragment: " + cv);
 
@@ -262,7 +288,8 @@ public class MainActivity extends AppCompatActivity implements
             AlertDialog.Builder adb = new AlertDialog.Builder(this);
             adb.setTitle("---")
                     .setMessage(R.string.shure)
-                    .setIcon(android.R.drawable.ic_dialog_info)
+//                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIconAttribute(android.R.attr.alertDialogIcon)
                     .setPositiveButton(R.string.ok, deleteDialogListener)
                     .setNegativeButton(R.string.cancel, deleteDialogListener);
             return adb.create();
@@ -305,7 +332,8 @@ public class MainActivity extends AppCompatActivity implements
                 case REQUEST_CODE_MAP:
 //                    int color = data.getIntExtra("color", Color.WHITE);
                     CameraPosition pos = data.getParcelableExtra("camera_position");
-                    log("cam pos = " + pos);
+                    onMapPositionIdle(pos);
+//                    log("cam pos = " + pos);
                     break;
             }
             // если вернулось не ОК
@@ -316,27 +344,46 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onMapPositionIdle(CameraPosition pos) {
-
+        LatLng target = pos.target;
+//        currentLocation.name = "";
+//        currentLocation.address = "";
+        currentMapPosition.lat = target.latitude;
+        currentMapPosition.lng = target.longitude;
+        currentMapPosition.zoom = pos.zoom;
+        log("MainActivity onMapPositionIdle, set new pos: " + target);
     }
 
-//    int getEntryValue(String key) {
-    int getEntryId() {
+    public HashMap getEntryFromMapPosition() {
+        HashMap entry = currentMapPosition.toHashMap();
+        entry.put(Constants.LOCATION_CATEGORY, getEntryId());
+        return entry;
+    }
+
+    public int getEntryId() {
+        log("CurrentEntry" + currentEntry);
         if (currentEntry == null) {
             return -1;
         }
-        return Integer.parseInt(currentEntry.get(Constants.COMMON_ID).toString());
+        return Integer.parseInt(currentEntry.get(
+                locationMode ? Constants.LOCATION_CATEGORY : Constants.COMMON_ID
+        ).toString());
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        /* class variables
+        Location currentMapPosition;
+        boolean locationMode;
+        int currentCmd;
+        HashMap currentEntry;
+        ActionMode mActionMode;
+        */
         super.onSaveInstanceState(outState);
-//        outState.putString("name", name);
-//        outState.putDouble("lat", lat);
-//        outState.putDouble("lng", lng);
-//        outState.putFloat("zoom", zoom);
-//        outState.putLong("id", locationId);
-
-        outState.putParcelable("location", location);
+        outState.putParcelable("map_position", currentMapPosition);
+        outState.putBoolean("location_mode", locationMode);
+        outState.putInt("current_cmd", currentCmd);
+        outState.putSerializable("current_entry", currentEntry);
+//        outState.putParcelable("", );
     }
 
     @Override
@@ -359,6 +406,11 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public ListViewFragment getListViewFragment() {
+        return (ListViewFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.main_list_fragment);
     }
 
     private void log(String msg) {

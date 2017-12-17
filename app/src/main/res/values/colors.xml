@@ -10,5 +10,6 @@
     <color name="divider">#BDBDBD</color>
 
     <color name="list_group">#ddd</color>
+    <color name="list_divider">#ccc</color>
     <color name="list_selector">#fff1c6</color>
 </resources>

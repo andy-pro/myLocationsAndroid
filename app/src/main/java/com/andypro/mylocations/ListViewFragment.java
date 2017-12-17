@@ -2,18 +2,18 @@ package com.andypro.mylocations;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.database.Cursor;
 import android.os.Bundle;
 
-//import android.support.v4.content.CursorLoader;
-//import android.support.v4.content.Loader;
+import android.database.Cursor;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.app.LoaderManager;
 //import android.support.v4.app.LoaderManager.LoaderCallbacks;
 
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.app.LoaderManager;
+//import android.content.CursorLoader;
+//import android.content.Loader;
+//import android.app.LoaderManager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +24,13 @@ import java.util.ArrayList;
 import com.andypro.mylocations.provider.LocationProvider;
 import com.andypro.mylocations.utils.Constants;
 
+import android.util.Log;
+
 public class ListViewFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
+
+    /* Location cursor loader id */
+    private static final int LIST_LOADER_ID = 1;
 
 //    OnLocationSelectedListener mListener;
     ListViewCallbacks mListener;
@@ -39,13 +44,11 @@ public class ListViewFragment extends Fragment implements
     LocationListAdapter adapter;
 //    DB db;
 
-    // Container Activity must implement this interface
     public interface ListViewCallbacks {
         void onLocationSelected(Cursor cursor);
         void onListItemLongClick(boolean locationMode, Cursor cursor);
     }
 
-//    public void onAttach(Activity activity) {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -57,14 +60,6 @@ public class ListViewFragment extends Fragment implements
         }
     }
 
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//        try {
-//            mListener = (OnLocationSelectedListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString() + " must implement OnLocationSelectedListener");
-//        }
-//    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -134,13 +129,67 @@ public class ListViewFragment extends Fragment implements
             }
         });
 
-        Loader<Cursor> loader = getActivity().getLoaderManager().getLoader(-1);
+        LoaderManager lm = getActivity().getSupportLoaderManager();
+        Loader<Cursor> loader = lm.getLoader(LIST_LOADER_ID);
+        log("ListViewFragment = onActivityCreated = getLoader: " + loader);
         if (loader != null && !loader.isReset()) {
-            getActivity().getLoaderManager().restartLoader(-1, null, this);
+            log("restart Loader!");
+            lm.restartLoader(LIST_LOADER_ID, null, this);
         } else {
-            getActivity().getLoaderManager().initLoader(-1, null, this);
+            log("init Loader!");
+            lm.initLoader(LIST_LOADER_ID, null, this);
         }
 
+//            lm.initLoader(LOADER_ID, null, this);
+
+    }
+
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // This is called when a new Loader needs to be created.
+        CursorLoader cl = new CursorLoader(getActivity(),
+                LocationProvider.CATEGORY_URI, Constants.CATEGORY_PROJECTION, null,
+                null, Constants.DEFAULT_SORT_ORDER);
+        log("LoaderManager: onCreateLoader id=" + id + "CursorLoader=" + cl);
+        return cl;
+    }
+
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        // Swap the new cursor in.
+        int id = loader.getId();
+        log("LoaderManager: onLoadFinished, id: " + id);
+        if (id == LIST_LOADER_ID) {
+            adapter.setGroupCursor(cursor);
+            expandAllChild();
+        }
+    }
+
+    private void expandAllChild() {
+        for (int i = 0; i < adapter.getGroupCount(); i++) {
+            elv.expandGroup(i);
+        }
+    }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // This is called when the last Cursor provided to onLoadFinished()
+        // is about to be closed.
+        int id = loader.getId();
+        log("LoaderManager: onLoaderReset, id: " + id);
+        if (id != -1) {
+//        if (id != LOADER_ID) {
+            // child cursor
+            try {
+                adapter.setChildrenCursor(id, null);
+            } catch (NullPointerException e) {
+                Log.w("TAG", "Adapter expired, try again on the next query: "
+                        + e.getMessage());
+            }
+        } else {
+            adapter.setGroupCursor(null);
+        }
+    }
+
+    public int getCategoryCount() {
+        return adapter.getGroupCount();
     }
 
     public ArrayList<ArrayList<String>> getCategoryNames() {
@@ -177,53 +226,6 @@ public class ListViewFragment extends Fragment implements
 ////        Log.d(Constants.LOG_TAG, "ListViewFragment onDestroy");
 //        db.close();
 //    }
-
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // This is called when a new Loader needs to be created.
-
-
-        CursorLoader cl = new CursorLoader(getActivity(),
-                LocationProvider.CATEGORY_URI, Constants.CATEGORY_PROJECTION, null,
-                null, Constants.DEFAULT_SORT_ORDER);
-
-        log("LoaderManager: onCreateLoader" + cl);
-
-        return cl;
-    }
-
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        log("LoaderManager: onLoadFinished");
-        // Swap the new cursor in.
-        int id = loader.getId();
-        if (id == -1) {
-            adapter.setGroupCursor(cursor);
-            expandAllChild();
-        }
-    }
-
-    private void expandAllChild() {
-        for (int i = 0; i < adapter.getGroupCount(); i++) {
-            elv.expandGroup(i);
-        }
-    }
-
-    public void onLoaderReset(Loader<Cursor> loader) {
-        log("LoaderManager: onLoaderReset");
-        // This is called when the last Cursor provided to onLoadFinished()
-        // is about to be closed.
-        int id = loader.getId();
-        if (id != -1) {
-            // child cursor
-            try {
-                adapter.setChildrenCursor(id, null);
-            } catch (NullPointerException e) {
-                Log.w("TAG", "Adapter expired, try again on the next query: "
-                        + e.getMessage());
-            }
-        } else {
-            adapter.setGroupCursor(null);
-        }
-    }
 
     private void log(String msg) {
         Log.d(Constants.LOG_TAG, msg);

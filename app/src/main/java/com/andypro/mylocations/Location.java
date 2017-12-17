@@ -12,6 +12,7 @@ import android.widget.Spinner;
 
 import com.andypro.mylocations.utils.Constants;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,6 +23,7 @@ public class Location implements Parcelable {
     float zoom;
     long _id, category;
 
+    /*
     public Location(boolean empty, long categoryId) {
         if (empty) {
             name = "";
@@ -30,12 +32,24 @@ public class Location implements Parcelable {
             lng = 0;
             category = categoryId;
         } else {
-            name = "London";
-            address = "United Kingdom";
+//            name = "London";
+//            address = "United Kingdom";
             lat = 51.510452;
             lng = -0.127716;
             category = -1;
         }
+        zoom = 10F;
+        _id = -1;
+    }
+    */
+
+    public Location() {
+        name = "";
+        address = "";
+//        category = categoryId;
+        category = -1;
+        lat = 51.510452;
+        lng = -0.12771;
         zoom = 10F;
         _id = -1;
     }
@@ -154,7 +168,7 @@ public class Location implements Parcelable {
     }
     */
 
-    public static ContentValues getContentValues(View view, ArrayList<ArrayList<String>> categoryList) {
+    public static ContentValues getContentValues(View view, ArrayList<String> categories_ids) {
 
         String name = ((EditText) view.findViewById(R.id.etName)).getText().toString();
         String address = ((EditText) view.findViewById(R.id.etAddress)).getText().toString();
@@ -163,7 +177,7 @@ public class Location implements Parcelable {
         Float zoom = Float.parseFloat(((EditText) view.findViewById(R.id.etZoom)).getText().toString());
 
         int pos = ((Spinner) view.findViewById(R.id.spinner)).getSelectedItemPosition();
-        long categoryId = Long.parseLong(categoryList.get(0).get(pos));
+        long categoryId = Long.parseLong(categories_ids.get(pos));
 //        id = Long.parseLong(((TextView) view.findViewById(R.id.tvId)).getText().toString());
 
         ContentValues entry = new ContentValues();
@@ -178,6 +192,25 @@ public class Location implements Parcelable {
         entry.put(Constants.LOCATION_CATEGORY, categoryId);
         return entry;
 
+    }
+
+    public static String format(HashMap entry, String key) {
+        /*
+        String fs = key == Constants.LOCATION_ZOOM ? "%.2f" : "%.5f";
+        return String.format(fs, Float.parseFloat(entry.get(key).toString()));
+        String fs = key == Constants.LOCATION_ZOOM ? "#0.00" : "#0.00000";
+        return new DecimalFormat(fs).format(Float.parseFloat(entry.get(key).toString()));
+        */
+        String src = entry.get(key).toString();
+        int pos = src.indexOf(".");
+        if (pos == -1) {
+            return src;
+        } else {
+            int len = src.length();
+            int end = pos + (key == Constants.LOCATION_ZOOM ? 3 : 6);
+            return src.substring(0, end > len ? len : end);
+//            Log.d("myLogs", "len:"+len+"end:"+end);
+        }
     }
 
 }

@@ -5,22 +5,22 @@
     tools:context="com.andypro.mylocations.MainActivity">
     <item
         android:id="@+id/menu_add"
-        android:icon="@android:drawable/ic_menu_add"
+        android:icon="@drawable/ic_action_add_circle"
         android:title=""
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_edit"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/ic_action_edit"
         android:title="@string/edit_record"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_delete"
-        android:icon="@android:drawable/ic_menu_delete"
+        android:icon="@drawable/ic_action_delete"
         android:title="@string/delete_record"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_new_location"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_action_add_location"
         android:title="@string/new_location"
         app:showAsAction="ifRoom" />
 </menu>

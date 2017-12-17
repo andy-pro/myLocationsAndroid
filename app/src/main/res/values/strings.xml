@@ -20,6 +20,13 @@
     <string name="copy_location">Copy location</string>
 
     <string name="map_not_ready">Map is not ready yet</string>
+    <string name="map_pos">Map position</string>
+
+    <string name="map_type_basic">Basic</string>
+    <string name="map_type_satellite">Satellite</string>
+    <string name="map_type_hybrid">Hybrid</string>
+    <string name="map_type_terrain">Terrain</string>
+
     <string name="shure">Are you shure?</string>
 
     <string name="location">Location</string>

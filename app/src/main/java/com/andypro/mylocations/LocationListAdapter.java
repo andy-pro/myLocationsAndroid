@@ -1,18 +1,19 @@
 package com.andypro.mylocations;
 
 import android.content.Context;
-import android.content.CursorLoader;
+
+//import android.database.Cursor;
+//import android.content.CursorLoader;
 import android.database.Cursor;
-import android.provider.SyncStateContract;
-import android.util.Log;
+import android.support.v4.content.CursorLoader;
+
+//import android.provider.SyncStateContract;
 import android.widget.SimpleCursorTreeAdapter;
 
 import com.andypro.mylocations.provider.LocationProvider;
 import com.andypro.mylocations.utils.Constants;
 
-/**
- * Created by Andy on 01.12.2017.
- */
+import android.util.Log;
 
 public class LocationListAdapter extends SimpleCursorTreeAdapter {
 
@@ -29,6 +30,7 @@ public class LocationListAdapter extends SimpleCursorTreeAdapter {
 //        mInflater = LayoutInflater.from(context);
     }
 
+    @Override
     protected Cursor getChildrenCursor(Cursor groupCursor) {
 
         Cursor itemCursor = getGroup(groupCursor.getPosition());

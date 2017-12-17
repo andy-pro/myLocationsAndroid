@@ -23,6 +23,7 @@
         <item name="queryBackground">@android:color/white</item>
     </style>
 
+    <!--<style name="AppTheme.ActionMode" parent="ThemeOverlay.AppCompat.Dark.ActionBar">-->
     <style name="AppTheme.ActionMode" parent="Widget.AppCompat.ActionMode">
         <item name="background">@color/primary</item>
     </style>

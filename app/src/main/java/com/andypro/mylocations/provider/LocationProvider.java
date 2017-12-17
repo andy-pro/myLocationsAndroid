@@ -40,6 +40,7 @@ public class LocationProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
 
+        Log.d(Constants.LOG_TAG, "====================================");
         Log.d(Constants.LOG_TAG, "onCreate LocationProvider");
 
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);

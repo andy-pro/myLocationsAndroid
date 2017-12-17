@@ -1,5 +1,6 @@
 package com.andypro.mylocations;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -26,16 +27,39 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapFragment extends Fragment implements
         OnMapReadyCallback, OnCameraIdleListener {
 
-    private GoogleMap gMap;
-//    private Location location;
-//    MapCallbacks mListener;
-
     public interface MapCallbacks {
         void onMapPositionIdle(CameraPosition pos);
     }
 
+    MapCallbacks mListener;
+    private GoogleMap gMap;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mListener = (MapCallbacks) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement OnLocationSelectedListener");
+        }
+    }
+
+    /*
+        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
+        MAP_TYPE_NORMAL: Basic map.
+        MAP_TYPE_SATELLITE: Satellite imagery.
+        MAP_TYPE_HYBRID: Satellite imagery with roads and labels.
+        MAP_TYPE_TERRAIN: Topographic data.
+        MAP_TYPE_NONE: No base map tiles.
+    */
+
+//    private Location location;
+//    MapCallbacks mListener;
+
+
     public static MapFragment newInstance(Location location) {
-        Log.d(Constants.LOG_TAG, "Map fragment new instance");
+        Log.d(Constants.LOG_TAG, "MapFragment: new instance");
         MapFragment map = new MapFragment();
         Bundle args = new Bundle();
         args.putParcelable("location", location);
@@ -66,52 +90,27 @@ public class MapFragment extends Fragment implements
         return true;
     }
 
-//    long getLocationId() {
-////        return getArguments().getLong("id");
-//        return location._id;
-//    }
-
     public void setMapLocation(Location location) {
         if (!checkReady()) {
             return;
         }
-
-        Log.d(Constants.LOG_TAG, "Camera factory for: " + location.name);
+        // Log.d(Constants.LOG_TAG, "Camera factory for: " + location.name);
         CameraPosition pos =
                 new CameraPosition.Builder().target(new LatLng(location.lat, location.lng))
                         .zoom(location.zoom)
                         .bearing(0)
                         .tilt(25)
                         .build();
-
-
         CameraUpdate update = CameraUpdateFactory.newCameraPosition(pos);
-
         gMap.animateCamera(update, 100, null);
-
     }
-
-
 
     @Override
     public void onMapReady(GoogleMap map) {
         gMap = map;
-        /*
-        name = getArguments().getString("name");
-        lat = getArguments().getDouble("lat");
-        lng = getArguments().getDouble("lng");
-        zoom = getArguments().getFloat("zoom");
-
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-        LatLng location = new LatLng(lat, lng);
-        mMap.addMarker(new MarkerOptions().position(location).title(name));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
-        */
         Location location = getArguments().getParcelable("location");
-        String name = location.name;
         LatLng pos = new LatLng(location.lat, location.lng);
-        gMap.addMarker(new MarkerOptions().position(pos).title(name));
+        // gMap.addMarker(new MarkerOptions().position(pos).title(location.name));
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, location.zoom));
         gMap.setOnCameraIdleListener(this);
     }
@@ -119,7 +118,8 @@ public class MapFragment extends Fragment implements
     @Override
     public void onCameraIdle() {
         CameraPosition pos = gMap.getCameraPosition();
-        ((MapCallbacks) getActivity()).onMapPositionIdle(pos);
+//        ((MapCallbacks) getActivity()).onMapPositionIdle(pos);
+        mListener.onMapPositionIdle(pos);
 //        mCameraTextView.setText(mMap.getCameraPosition().toString());
     }
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,13 +16,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
+            android:inputType="textCapWords"
             android:hint="@string/location" />
         <EditText
             android:id="@+id/etZoom"
+            android:inputType="numberDecimal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="numberSigned"
             android:layout_weight="1"
             android:hint="@string/zoom" />
     </LinearLayout>
@@ -30,6 +31,7 @@
         android:id="@+id/etAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textCapWords"
         android:hint="@string/address" />
 
     <LinearLayout
@@ -38,22 +40,32 @@
         android:layout_height="wrap_content">
         <EditText
             android:id="@+id/etLat"
+            android:inputType="numberDecimal|numberSigned"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/lat" />
         <EditText
             android:id="@+id/etLng"
+            android:inputType="numberDecimal|numberSigned"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/lng" />
+
+        <ImageButton
+            android:id="@+id/ibSetPos"
+            android:layout_width="42dp"
+            android:layout_height="46dp"
+            android:contentDescription="@string/map_pos"
+            app:srcCompat="@drawable/ic_action_my_location" />
+
     </LinearLayout>
 
     <Spinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="12dp" />
 
 </LinearLayout>

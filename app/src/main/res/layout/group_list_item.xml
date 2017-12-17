@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingVertical="10dp"
-    android:paddingHorizontal="20dp"
-    android:orientation="horizontal"
-    android:background="@color/list_group">
+<!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="50dp"-->
+    <!--android:orientation="vertical"-->
+    <!--android:layout_marginBottom="2dp">-->
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/categoryName"
         android:textStyle="bold"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/listPreferredItemHeight"
-        android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
-        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:layout_height="50dp"
+        android:background="@color/list_group"
         android:textAppearance="?android:attr/textAppearanceListItem"
         android:gravity="center_vertical"
-        android:textAlignment="center"
-         />
+        android:textAlignment="center" />
+        <!--android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"-->
+        <!--android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"-->
+        <!--android:layout_height="?android:attr/listPreferredItemHeight"-->
 
-</LinearLayout>
+<!--</LinearLayout>-->
